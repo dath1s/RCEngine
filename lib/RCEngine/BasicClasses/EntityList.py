@@ -1,0 +1,2 @@
+class EntityList:
+    pass

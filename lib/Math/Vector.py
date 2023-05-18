@@ -1,5 +1,5 @@
-from lib.RCEngine.BasicClasses.Matrix import Matrix
-from lib.Exceptions.EngineExceptions import VectorException
+from lib.Math.Matrix import Matrix
+from lib.Exceptions.MathExceptions.EngineExceptions import VectorException
 
 
 class Vector:
@@ -22,7 +22,7 @@ class Vector:
             self.elements[key] = value
         self.elements[key][0] = value
 
-    def __add__(self, other):
+    def addition(self, other):
         if not isinstance(other, Vector):
             raise VectorException.SUM_TYPE_ERROR
         if self.dim() != other.dim():
@@ -36,7 +36,10 @@ class Vector:
             return Vector(elements=[self[i] + other[i] for i in range(self.dim())])
         return Vector(elements=[[self[i] + other[i]] for i in range(self.dim())])
 
-    def __mul__(self, other):
+    def __add__(self, other):
+        return self.addition(other)
+
+    def multiplication(self, other):
         if isinstance(other, Vector):
             if self.dim() != other.dim():
                 raise VectorException.WRONG_DIMS
@@ -48,6 +51,9 @@ class Vector:
         if self.is_line:
             return Vector(elements=[self[i] * other for i in range(self.dim())])
         return Vector(elements=[[self[i] * other] for i in range(self.dim())])
+
+    def __mul__(self, other):
+        return self.multiplication(other)
 
     def __sub__(self, other):
         return self.__add__((-1) * other)

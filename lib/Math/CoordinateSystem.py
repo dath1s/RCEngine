@@ -1,5 +1,5 @@
-from lib.RCEngine.BasicClasses.Point import Point
-from lib.RCEngine.BasicClasses.VectorSpace import VectorSpace
+from lib.Math.Point import Point
+from lib.Math.VectorSpace import VectorSpace
 
 
 class CoordinateSystem:

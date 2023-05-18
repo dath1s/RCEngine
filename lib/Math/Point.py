@@ -1,5 +1,5 @@
-from lib.RCEngine.BasicClasses.Vector import Vector
-from lib.Exceptions.EngineExceptions import PointExceptions
+from lib.Math.Vector import Vector
+from lib.Exceptions.MathExceptions.EngineExceptions import PointExceptions
 
 
 class Point(Vector):

@@ -1,5 +1,5 @@
 from math import pi, cos, sin
-from lib.Exceptions.EngineExceptions import MatrixException
+from lib.Exceptions.MathExceptions.EngineExceptions import MatrixException
 
 
 class Matrix:
@@ -26,7 +26,7 @@ class Matrix:
     def __setitem__(self, key: int | slice, value: int | float | list) -> None:
         self[key] = value
 
-    def __add__(self, other):
+    def addition(self, other):
         if not isinstance(other, Matrix):
             raise MatrixException.SUM_TYPE_ERROR
 
@@ -37,7 +37,10 @@ class Matrix:
             [self[row][col] + other[row][col] for col in range(self.m)] for row in range(self.n)
         ])
 
-    def __mul__(self, other):
+    def __add__(self, other):
+        return self.addition(other)
+
+    def multiplication(self, other):
         if not isinstance(other, int | float | Matrix):
             raise MatrixException.MUL_TYPE_ERROR
 
@@ -53,6 +56,9 @@ class Matrix:
                 return Matrix(elements=[
                     [sum([i * j for (i, j) in zip(row1, row2)]) for row2 in zip(*(other[:]))] for row1 in self[:]
                 ])
+
+    def __mul__(self, other):
+        return self.multiplication(other)
 
     def __rmul__(self, other):
         if not isinstance(other, int | float | Matrix):
@@ -114,7 +120,12 @@ class Matrix:
         return sum([i ** 2 for i in sum(self, [])]) ** .5
 
     def norm(self) -> float:
-        return sum([max([abs(x) for x in row]) for row in self])
+        max_sum = 0
+        for row in self[:]:
+            row_sum = sum(map(abs, row))
+            if row_sum > max_sum:
+                max_sum = row_sum
+        return max_sum
 
     def __truediv__(self, other):
         if not isinstance(other, int | float | Matrix):

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from lib.RCEngine.BasicClasses.Matrix import Matrix
+from lib.Math.Matrix import Matrix
 
 
 class TestMatrix(TestCase):

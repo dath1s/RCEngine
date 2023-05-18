@@ -1,6 +1,6 @@
-from lib.RCEngine.BasicClasses.Vector import Vector
-from lib.RCEngine.BasicClasses.Matrix import Matrix
-from lib.Exceptions.EngineExceptions import VectorSpaceExceptions
+from lib.Math.Vector import Vector
+from lib.Math.Matrix import Matrix
+from lib.Exceptions.MathExceptions.EngineExceptions import VectorSpaceExceptions
 
 
 class VectorSpace:

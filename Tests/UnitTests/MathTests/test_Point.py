@@ -1,6 +1,6 @@
 from unittest import TestCase
-from lib.RCEngine.BasicClasses.Point import Point
-from lib.RCEngine.BasicClasses.Vector import Vector
+from lib.Math.Point import Point
+from lib.Math.Vector import Vector
 
 
 class TestPoint(TestCase):

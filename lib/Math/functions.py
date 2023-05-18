@@ -1,5 +1,5 @@
-from lib.RCEngine.BasicClasses.Matrix import Matrix
-from lib.RCEngine.BasicClasses.Vector import Vector
+from lib.Math.Matrix import Matrix
+from lib.Math.Vector import Vector
 
 
 def BilinearForm(matrix: Matrix, vector1: Vector, vector2: Vector):

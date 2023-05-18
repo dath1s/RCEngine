@@ -1,7 +1,7 @@
 from unittest import TestCase
-from lib.RCEngine.BasicClasses.Point import Point
-from lib.RCEngine.BasicClasses.Vector import Vector
-from lib.RCEngine.BasicClasses.VectorSpace import VectorSpace
+from lib.Math.Point import Point
+from lib.Math.Vector import Vector
+from lib.Math.VectorSpace import VectorSpace
 
 
 class TestVectorSpace(TestCase):
