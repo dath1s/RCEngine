@@ -1,3 +1,5 @@
+import uuid
+
 class Identifier:
     IDS = set([0])
 
@@ -10,7 +12,7 @@ class Identifier:
 
     @classmethod
     def __generate__(cls):
-        value = cls.IDS[-1] + 1 # Some magic
+        value = uuid.uuid4()
 
         if value in cls.IDS:
             return cls.__generate__()

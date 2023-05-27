@@ -12,6 +12,7 @@ class MatrixException(EngineException):
     GRAM_TYPE_ERROR = 'all elements in args must be Matrix()'
     WRONG_SIZE = 'Matrix() must be 1xm'
     WRONG_DIMENSION = 'Matrix() can be rotated only in 2/3 dimension'
+    WRONG_SIZE = "different size, so operation isn't allowed"
 
     @staticmethod
     def MATRIX_WRONG_SIZES(n1: int, m1: int, n2: int, m2: int) -> str:

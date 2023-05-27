@@ -1,5 +1,6 @@
 from lib.Math.Matrix import Matrix
 from lib.Exceptions.MathExceptions.EngineExceptions import VectorException
+from lib.globals import *
 
 
 class Vector:
@@ -153,4 +154,4 @@ class Vector:
             return False
         if self.is_line != other.is_line:
             return False
-        return all([abs(self[i] - other[i]) < 1e-5 for i in range(self.dim())])
+        return all([abs(self[i] - other[i]) < (10 ** (-PRECISION)) for i in range(self.dim())])

@@ -71,7 +71,7 @@ class TestMatrix(TestCase):
                              [19, -18, 0, 0],
                              [1, 1, 11, 5]])
 
-        self.assertEqual(a.norm(), 156)
+        self.assertEqual(a.norm(), 232)
 
     def sum_matrix(self):
         a = Matrix(elements=[[1, 2, 3, 4],

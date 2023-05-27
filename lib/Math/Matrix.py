@@ -1,5 +1,6 @@
 from math import pi, cos, sin
 from lib.Exceptions.MathExceptions.EngineExceptions import MatrixException
+from lib.globals import *
 
 
 class Matrix:
@@ -195,4 +196,4 @@ class Matrix:
     def __eq__(self, other):
         if (self.n != other.n) | (self.m != other.m):
             return False
-        return all(abs(self[i][j] - other[i][j]) < 1e-5 for i in range(self.n) for j in range(self.m))
+        return all(abs(self[i][j] - other[i][j]) < (10 ** (-PRECISION)) for i in range(self.n) for j in range(self.m))
