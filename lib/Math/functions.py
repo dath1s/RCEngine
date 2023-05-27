@@ -1,6 +1,6 @@
 from lib.Math.Matrix import Matrix
 from lib.Math.Vector import Vector
-from lib.Exceptions.MathExceptions.EngineExceptions import MatrixException
+from lib.Exceptions.MathExceptions.MathExceptions import MatrixException
 
 
 def BilinearForm(matrix: Matrix, vector1: Vector, vector2: Vector):

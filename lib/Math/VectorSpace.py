@@ -1,6 +1,6 @@
 from lib.Math.Vector import Vector
 from lib.Math.Matrix import Matrix
-from lib.Exceptions.MathExceptions.EngineExceptions import VectorSpaceExceptions
+from lib.Exceptions.MathExceptions.MathExceptions import VectorSpaceExceptions
 
 
 class VectorSpace:

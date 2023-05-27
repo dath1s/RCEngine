@@ -1,5 +1,5 @@
 from lib.Math.Vector import Vector
-from lib.Exceptions.MathExceptions.EngineExceptions import PointExceptions
+from lib.Exceptions.MathExceptions.MathExceptions import PointExceptions
 
 
 class Point(Vector):

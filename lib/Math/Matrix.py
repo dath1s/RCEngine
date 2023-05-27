@@ -1,5 +1,5 @@
 from math import pi, cos, sin
-from lib.Exceptions.MathExceptions.EngineExceptions import MatrixException
+from lib.Exceptions.MathExceptions.MathExceptions import MatrixException
 from lib.globals import *
 
 

@@ -6,6 +6,7 @@ from math import pi
 from lib.globals import *
 from lib.RCEngine.BasicClasses.Entity import Entity
 from lib.RCEngine.BasicClasses.Ray import Ray
+from lib.Exceptions.EngineExceptions.EngineExceptions import GameObjectExceptions
 
 
 class Game:
@@ -39,13 +40,13 @@ class Game:
 
         def planar_rotate(self, inds: (int, int), angle: float) -> None:
             if self['direction'].dim() != 2:
-                raise Exception
+                raise GameObjectExceptions.WRONG_DIM(2)
 
             self['direction'].rotate(inds, angle)
 
         def rotate_3d(self, angles: (float, float, float)) -> None:
             if self.dir.dim() != 3:
-                raise Exception
+                raise GameObjectExceptions.WRONG_DIM(3)
 
             self['direction'].teit_bryan_rotate(angles)
 
@@ -53,7 +54,7 @@ class Game:
             self.pos = pos
 
         def set_direction(self, dir: Vector) -> None:
-            self.dir = dir
+            self.dir = dir.normalize()
 
     class Camera:
         def __init__(self, fov: float, draw_dist: float, vfov: float = None, look_at: Point = None):
