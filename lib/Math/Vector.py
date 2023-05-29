@@ -1,6 +1,6 @@
 from lib.Math.Matrix import Matrix
 from lib.Exceptions.MathExceptions.MathExceptions import VectorException
-from lib.globals import *
+from config.globals import *
 
 
 class Vector:

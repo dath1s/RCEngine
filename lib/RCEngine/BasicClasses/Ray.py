@@ -8,3 +8,6 @@ class Ray:
         self.cs = cs
         self.initial_pt = initial_pt
         self.dir = direction
+
+    def normalize(self) -> None:
+        self.dir = self.dir.normalize()

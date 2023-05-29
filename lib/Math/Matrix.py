@@ -1,10 +1,11 @@
 from math import pi, cos, sin
 from lib.Exceptions.MathExceptions.MathExceptions import MatrixException
-from lib.globals import *
+from config.globals import *
+from lib.RCEngine.BasicClasses.Ray import Ray
 
 
 class Matrix:
-    def __init__(self, n: int = 0, m: int = None, elements: list[list[int | float]] = None) -> None:
+    def __init__(self, n: int = 0, m: int = None, elements: list[list[int | float | Ray]] = None) -> None:
         match (n, m, elements):
             case (n, None, None):
                 self.elements = [[0 for _ in range(n)] for _ in range(n)]
@@ -22,7 +23,7 @@ class Matrix:
         return f"Matrix_{self.n}x{self.m}[{', '.join([str(row) for row in self.elements])}]"
 
     def __getitem__(self, item: int | slice) -> list[int | float] | int | float:
-        return self.elements[item]
+        return [list(line) for line in list(zip(*self.elements))][item]
 
     def __setitem__(self, key: int | slice, value: int | float | list) -> None:
         self[key] = value
