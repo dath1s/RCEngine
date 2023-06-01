@@ -16,10 +16,13 @@ class Entity:
             raise Exception
         del self.properties[prop]
 
-    def __getitem__(self, item: str) -> any:
+    def get_property(self, item: str):
         if item not in self.properties.keys():
             raise Exception
         return self.properties[item]
+
+    def __getitem__(self, item: str) -> any:
+        return self.get_property(item)
 
     def __setitem__(self, key: str, value: any) -> None:
         self.properties[key] = value

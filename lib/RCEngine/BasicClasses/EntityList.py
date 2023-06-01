@@ -21,8 +21,9 @@ class EntityList:
 
         return [i for i in self.entities if i.identifier == id][0]
 
-    def exec(self, func: callable) -> None:
-        self.entities = list(map(func, self.entities))
+    def exec(self, func: callable, *args, **kwargs) -> None:
+        for entity in self.entities:
+            func(entity, *args, **kwargs)
 
     def __getitem__(self, item):
         self.get(item)

@@ -26,7 +26,7 @@ class TestVector(TestCase):
         a = Vector(elements=[3, 0, 4])
         ans = Vector(elements=[0.6, 0, 0.8])
 
-        self.assertEqual(a, ans)
+        self.assertEqual(a.normalize(), ans)
 
     def test_dim(self):
         a = Vector(elements=[3, 0, 4])
@@ -78,4 +78,4 @@ class TestVector(TestCase):
         a = Vector(elements=[1, 2, 3])
         ans = Vector(elements=[-2.0, 1.0, 3])
 
-        self.assertEqual(a, ans)
+        self.assertEqual(a.rotate([0, 1], 90), ans)

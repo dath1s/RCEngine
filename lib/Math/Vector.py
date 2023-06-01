@@ -12,6 +12,7 @@ class Vector:
             case None, elements:
                 self.elements = elements
                 self.is_line = True if isinstance(elements[0], (int, float)) else False
+        self.size = len(self.elements)
 
     def __getitem__(self, item: (int | slice)):
         if self.is_line:
@@ -73,12 +74,15 @@ class Vector:
     def scalar_product(self, other, basis=None):
         if not isinstance(other, Vector):
             raise VectorException.SCALAR_PROD_ERROR
+
         if self.dim() != other.dim():
             x1, y1 = [1, len(self.elements)] if self.is_line else [len(self.elements), 1]
             x2, y2 = [1, len(other.elements)] if other.is_line else [len(other.elements), 1]
             raise VectorException.VECTOR_WRONG_SIZES(x1, y1, x2, y2)
+
         if self.is_line != other.is_line:
             raise VectorException.SCALAR_PROD_IS_LINE_ERROR
+
         if basis is None:
             ortonorm_basis = [Matrix(elements=[[1 if x == i else 0 for x in range(self.dim())]]) for i in
                               range(self.dim())]
@@ -87,14 +91,17 @@ class Vector:
                 x1, y1 = [1, len(self.elements)] if self.is_line else [len(self.elements), 1]
                 x2, y2 = [1, len(other.elements)] if other.is_line else [len(other.elements), 1]
                 raise VectorException.VECTOR_WRONG_SIZES(x1, y1, x2, y2)
+
             if not all([isinstance(i, Matrix) for i in basis]):
                 raise VectorException.SCALAR_PROD_TYPE_ERROR
+
             ortonorm_basis = basis
 
         if not self.is_line:
-            self = self.transpose()
+            self.elements = self.transpose()
         if other.is_line:
             other = other.transpose()
+
         return (self.vector2matrix() * Matrix().gram(ortonorm_basis) * other.vector2matrix())[0][0]
 
     def vector_product(self, other, basis=None):

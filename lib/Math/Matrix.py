@@ -1,11 +1,10 @@
 from math import pi, cos, sin
 from lib.Exceptions.MathExceptions.MathExceptions import MatrixException
 from config.globals import *
-from lib.RCEngine.BasicClasses.Ray import Ray
 
 
 class Matrix:
-    def __init__(self, n: int = 0, m: int = None, elements: list[list[int | float | Ray]] = None) -> None:
+    def __init__(self, n: int = 0, m: int = None, elements: list[list[any]] = None) -> None:
         match (n, m, elements):
             case (n, None, None):
                 self.elements = [[0 for _ in range(n)] for _ in range(n)]
@@ -23,7 +22,7 @@ class Matrix:
         return f"Matrix_{self.n}x{self.m}[{', '.join([str(row) for row in self.elements])}]"
 
     def __getitem__(self, item: int | slice) -> list[int | float] | int | float:
-        return [list(line) for line in list(zip(*self.elements))][item]
+        return self.elements[item]
 
     def __setitem__(self, key: int | slice, value: int | float | list) -> None:
         self[key] = value
@@ -55,9 +54,12 @@ class Matrix:
                 if self.m != other.n:
                     raise MatrixException.MATRIX_WRONG_SIZES(self.n, self.m, other.n, other.m)
 
-                return Matrix(elements=[
-                    [sum([i * j for (i, j) in zip(row1, row2)]) for row2 in zip(*(other[:]))] for row1 in self[:]
-                ])
+                new_matrix = Matrix(elements=[[0 for _ in range(other.m)] for _ in range(self.n)])
+                for i in range(self.n):
+                    for j in range(other.m):
+                        new_matrix[i][j] = sum([self[:][i][f] * other.transpose()[:][j][f] for f in range(len(self[i]))])
+
+                return new_matrix
 
     def __mul__(self, other):
         return self.multiplication(other)
@@ -95,9 +97,7 @@ class Matrix:
             return ans_vector
 
     def transpose(self):
-        return Matrix(elements=[
-            list(line) for line in list(zip(*self[:]))
-        ])
+        return Matrix(elements=[[self[j][i] for j in range(len(self[:]))] for i in range(len(self[0]))])
 
     def inverse(self):
         if self.n != self.m:
@@ -154,13 +154,12 @@ class Matrix:
         gram_matrix = Matrix(n=len(args))
         for i in range(len(args)):
             for j in range(len(args)):
-                for (vector1, vector2) in zip(args[i], args[j]):
-                    gram_matrix[i][j] = sum(vector1[k] * vector2[k] for k in range(len(vector1)))
+                gram_matrix[i][j] = sum(args[i][:][0][k] * args[j][:][0][k] for k in range(len(args[i][:][0])))
 
         return gram_matrix
 
     def rotate(self, axes_inx: list[int], angle: float | int):
-        angle = angle*pi/180
+        angle = angle * pi / 180
         rot_matrix = Matrix().identity(self.m)
 
         power = (-1) ** sum(axes_inx)

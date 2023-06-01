@@ -18,3 +18,6 @@ class Identifier:
             return cls.__generate__()
 
         return value
+
+    def __eq__(self, other):
+        return True if self.value == other.value else False

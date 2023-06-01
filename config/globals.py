@@ -1,1 +1,2 @@
 PRECISION = 8
+SCREEN_SIZE = (4, 3)
