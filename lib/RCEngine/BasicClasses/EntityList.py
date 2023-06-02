@@ -1,5 +1,6 @@
 from lib.RCEngine.BasicClasses.Entity import Entity
 from lib.RCEngine.BasicClasses.Identifier import Identifier
+from lib.Exceptions.EngineExceptions.EngineExceptions import EntityListExceptions
 
 
 class EntityList:
@@ -11,13 +12,13 @@ class EntityList:
 
     def remove(self, entity: Entity) -> None:
         if entity.identifier not in [i.identifier for i in self.entities]:
-            raise Exception
+            raise EntityListExceptions.ID_ERROR
 
         self.entities.remove(entity)
 
     def get(self, id: Identifier):
         if id not in [i.identifier for i in self.entities]:
-            raise Exception
+            raise EntityListExceptions.ID_ERROR
 
         return [i for i in self.entities if i.identifier == id][0]
 

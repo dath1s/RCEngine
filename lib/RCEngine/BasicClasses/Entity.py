@@ -1,5 +1,6 @@
 from lib.Math.CoordinateSystem import CoordinateSystem
 from lib.RCEngine.BasicClasses.Identifier import Identifier
+from lib.Exceptions.EngineExceptions.EngineExceptions import EntityExceptions
 
 
 class Entity:
@@ -13,12 +14,12 @@ class Entity:
 
     def remove_property(self, prop: str) -> None:
         if prop not in self.properties.keys():
-            raise Exception
+            raise EntityExceptions.PROPERTY_ERROR
         del self.properties[prop]
 
     def get_property(self, item: str):
         if item not in self.properties.keys():
-            raise Exception
+            raise EntityExceptions.PROPERTY_ERROR
         return self.properties[item]
 
     def __getitem__(self, item: str) -> any:

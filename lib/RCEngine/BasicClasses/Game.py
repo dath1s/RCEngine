@@ -143,10 +143,11 @@ class Game:
             def __init__(other, n: int, m: int) -> None:
                 other.n = n
                 other.m = m
-                other.distances = self.Camera().get_rays_matrix(n, m)
+                # other.distances = self.Camera().get_rays_matrix(n, m)
+                other.distances = Matrix(n, m)
 
             def draw(self) -> None:
                 pass
 
             def update(self, camera):
-                pass
+                self.distances = camera.get_rays_matrix(self.n, self.m)
