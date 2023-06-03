@@ -18,7 +18,7 @@ class TestEntity(TestCase):
 
         entity = Entity(cs)
         entity.set_property("key", 123)
-        self.assertEqual(entity.properties['key'], 123)
+        self.assertEqual(entity['key'], 123)
 
     def test_remove_property(self):
         v1 = Vector(elements=[1, 0, 0])

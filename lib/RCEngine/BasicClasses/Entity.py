@@ -5,28 +5,41 @@ from lib.Exceptions.EngineExceptions.EngineExceptions import EntityExceptions
 
 class Entity:
     def __init__(self, cs: CoordinateSystem):
-        self.cs = cs
-        self.identifier = Identifier()
-        self.properties = {}
+        self.__dict__["properties"] = set()
+        self.set_property("cs", cs)
+        self.set_property("identifier", Identifier())
 
     def set_property(self, prop: str, value: any) -> None:
-        self.properties[prop] = value
+        if prop == "properties":
+            raise Exception
+
+        self.__dict__[prop] = value
+        self.__dict__["properties"].add(prop)
 
     def remove_property(self, prop: str) -> None:
-        if prop not in self.properties.keys():
-            raise EntityExceptions.PROPERTY_ERROR
-        del self.properties[prop]
+        if prop == "properties":
+            raise Exception
+
+        if prop not in self.__dict__["properties"]:
+            raise Exception
+
+        self.__delattr__(prop)
+        self.__dict__["properties"].remove(prop)
 
     def get_property(self, item: str):
-        if item not in self.properties.keys():
-            raise EntityExceptions.PROPERTY_ERROR
-        return self.properties[item]
+        if item not in self.__dict__["properties"]:
+            raise Exception
 
-    def __getitem__(self, item: str) -> any:
+        return self.__dict__[item]
+
+    def __getattr__(self, item):
         return self.get_property(item)
 
-    def __setitem__(self, key: str, value: any) -> None:
-        self.properties[key] = value
+    def __setattr__(self, item, value):
+        return self.set_property(item, value)
 
-    def __getattr__(self, item: str):
-        return self[item]
+    def __getitem__(self, item):
+        return self.get_property(item)
+
+    def __setitem__(self, item, value):
+        return self.set_property(item, value)
