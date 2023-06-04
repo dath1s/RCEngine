@@ -8,6 +8,7 @@ from lib.RCEngine.BasicClasses.Entity import Entity
 from lib.RCEngine.BasicClasses.Ray import Ray
 from lib.Exceptions.EngineExceptions.EngineExceptions import GameObjectExceptions
 from lib.Math.Matrix import Matrix
+from math import sqrt
 
 
 class Game:
@@ -69,13 +70,18 @@ class Game:
 
     def Camera(self):
         class GCamera(self.Object()):
-            def __init__(other, fov: float, draw_dist: float, vfov: float = None, look_at: Point = None):
+            def __init__(other, position: Point, fov: float, draw_dist: float, vfov: float = None,
+                         look_at: Point = None):
+                super().__init__(position, look_at)
                 other.set_property('fov', round(fov * pi / 180, PRECISION))
                 other.set_property('draw_dist', round(draw_dist, PRECISION))
                 other.entity = Entity(other.cs)
 
-                if vfov is not None:
+                if vfov is None:
                     other.set_property('vfov', atan((SCREEN_SIZE[0] / SCREEN_SIZE[1]) * tan(other['fov'] / 2)))
+                else:
+                    other.set_property('vfov', round(vfov * pi / 180, PRECISION))
+
                 if look_at is not None:
                     other.set_property('look_at', look_at)
 
@@ -107,6 +113,7 @@ class Game:
     def HyperPlane(self):
         class GHyperPlane(self.Object()):
             def __init__(other, pos: Point, normal: Vector) -> None:
+                super().__init__()
                 other.set_property('position', pos)
                 other.set_property('normal', normal)
                 other.set_property('direction', other['direction'].normalize())
@@ -118,23 +125,72 @@ class Game:
                 self.set_property('normal', self['normal'].teit_bryan_rotate(angles))
 
             def intersection_distance(self, ray: Ray) -> float:
-                pass
+                ray_pt = ray.initial_pt
+                ray_dir = ray.dir
+
+                plane_pt = self.position
+                plane_dir = self.direction
+
+                if not (plane_dir % ray_dir):
+                    if plane_dir % (ray_pt - plane_pt):
+                        raise Exception
+                    else:
+                        return 0
+                else:
+                    temp = -(plane_dir % (ray_pt - plane_pt)) / (plane_dir % ray_dir)
+                    if temp < 0:
+                        return -1
+                    else:
+                        return (temp * ray_dir).length()
 
         return GHyperPlane
 
     def HyperEllipsoid(self):
         class GHyperEllipsoid(self.Object()):
             def __init__(other, pos: Point, dir: Vector, semiaxes: list[float]) -> None:
-                pass
+                super().__init__(pos, dir)
+                other.set_property("semiaxes", semiaxes)
 
             def planar_rotate(self, inds: (int, int), angle: float) -> None:
-                pass
+                super(GHyperEllipsoid, self).planar_rotate(inds, angle)
 
             def rotate_3d(self, angles: (float, float, float)) -> None:
-                pass
+                super(GHyperEllipsoid, self).rotate_3d(angles)
 
-            def intersection_distance(self, ray: Ray) -> float:
-                pass
+            def intersection_distance(self, ray: Ray):
+                ray_pt = ray.initial_pt
+                ray_dir = ray.dir
+
+                ellips_dir = self.direction
+
+                alpha = (ray_dir[0] ** 2) / (ellips_dir[0] ** 2) + (ray_dir[1] ** 2) / (ellips_dir[1] ** 2) + (
+                        ray_dir[2] ** 2) / (ellips_dir[2] ** 2)
+                beta = 2 * ((ray_dir[0] * ray_pt[0]) / (ellips_dir[0] ** 2) + (ray_dir[1] * ray_pt[1]) / (
+                        ellips_dir[1] ** 2) + (ray_dir[2] * ray_pt[2]) / (ellips_dir[2] ** 2))
+                gamma = (ray_pt[0] ** 2) / (ellips_dir[0] ** 2) + (ray_pt[1] ** 2) / (ellips_dir[1] ** 2) + (
+                        ray_pt[2] ** 2) / (ellips_dir[2] ** 2)
+
+                disc = beta ** 2 - 4 * alpha * gamma
+                if disc < 0:
+                    return -1
+                else:
+                    t1 = (-beta + sqrt(disc)) / (2 * alpha)
+                    t2 = (-beta - sqrt(disc)) / (2 * alpha)
+
+                    vec1 = ray_dir * t1
+                    vec2 = ray_dir * t2
+
+                    if (t1 > 0) and (t2 > 0):
+                        return min(vec1.length(), vec2.length())
+
+                    elif (t1 > 0) and (t2 <= 0):
+                        return vec1.length()
+
+                    elif (t1 <= 0) and (t2 < 0):
+                        return vec2.length()
+
+                    else:
+                        return -1
 
         return GHyperEllipsoid
 
@@ -143,11 +199,19 @@ class Game:
             def __init__(other, n: int, m: int) -> None:
                 other.n = n
                 other.m = m
-                # other.distances = self.Camera().get_rays_matrix(n, m)
                 other.distances = Matrix(n, m)
+                for row in range(len(other.distances[:])):
+                    for col in range(len(other.distances[row][:])):
+                        other.distances[row][col] = 999
 
             def draw(self) -> None:
                 pass
 
-            def update(self, camera):
-                self.distances = camera.get_rays_matrix(self.n, self.m)
+            def update(other, camera):
+                ray_matrix = camera.get_rays_matrix(other.n, other.m)
+                for row_ind in range(len(ray_matrix[:])):
+                    for ray_ind in range(len(ray_matrix[row_ind][:])):
+                        for entity in self.entities:
+                            ans = entity.intersection_distance(ray_matrix[row_ind][ray_ind])
+                            other.distances[row_ind][ray_ind] = ans if ans < other.distances[row_ind][ray_ind] else \
+                                other.distances[row_ind][ray_ind]

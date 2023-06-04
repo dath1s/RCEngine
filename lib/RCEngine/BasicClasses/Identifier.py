@@ -1,7 +1,7 @@
 import uuid
 
 class Identifier:
-    IDS = set([0])
+    IDS = set()
 
     def __init__(self):
         self.value = Identifier.__generate__()

@@ -73,28 +73,10 @@ class TestGame(TestCase):
             obj.set_direction(Vector(elements=[3, 0, 0]))
             self.assertEqual(obj['direction'], Vector(elements=[1, 0, 0]))
 
-        def test_intersection_distance():
-            pass
-
         test_move()
         test_planar_rotate()
         test_set_direction()
         test_set_position()
-        test_intersection_distance()
-
-    def test_camera(self):
-        v1 = Vector(elements=[1, 0, 0])
-        v2 = Vector(elements=[0, 1, 0])
-        v3 = Vector(elements=[0, 0, 1])
-        vs = VectorSpace([v1, v2, v3])
-        point = Point(3)
-
-        cs = CoordinateSystem(point, vs)
-
-        entity1 = Entity(cs)
-        entity2 = Entity(cs)
-        entity_list = EntityList([entity1, entity2])
-        game = Game(cs, entity_list)
 
     def test_hyper_plane(self):
         v1 = Vector(elements=[1, 0, 0])

@@ -1,21 +1,18 @@
-from lib.RCEngine.BasicClasses import Entity
-from lib.Math.Point import Point
-from lib.Math.Vector import Vector
-from lib.Math.VectorSpace import VectorSpace
-from lib.Math.CoordinateSystem import CoordinateSystem
+from lib.RCEngine.BasicClasses.Entity import Entity
+from lib.RCEngine.BasicClasses.EntityList import EntityList
+from lib.RCEngine.BasicClasses.Game import Game
+from lib.RCEngine.BasicClasses.Ray import Ray
+import keyboard
 
 
 if __name__ == '__main__':
-    v1 = Vector(elements=[1, 0, 0])
-    v2 = Vector(elements=[0, 1, 0])
-    v3 = Vector(elements=[0, 0, 1])
-    vs = VectorSpace([v1, v2, v3])
-    point = Point(3)
+    def on_press(key):
+        print(key.name)
 
-    cs = CoordinateSystem(point, vs)
+    def esc_press():
+        exit()
 
-    ent = Entity.Entity(cs)
-    ent.kek = 1
-    print(ent.kek)
-    print(ent.properties)
-
+    keyboard.add_hotkey('esc', esc_press)
+    keyboard.on_press(on_press)
+    while True:
+        pass
