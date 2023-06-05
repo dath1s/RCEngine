@@ -113,7 +113,7 @@ class Game:
     def HyperPlane(self):
         class GHyperPlane(self.Object()):
             def __init__(other, pos: Point, normal: Vector) -> None:
-                super().__init__()
+                super().__init__(pos, normal)
                 other.set_property('position', pos)
                 other.set_property('normal', normal)
                 other.set_property('direction', other['direction'].normalize())
@@ -141,7 +141,7 @@ class Game:
                     if temp < 0:
                         return -1
                     else:
-                        return (temp * ray_dir).length()
+                        return (ray_dir * temp).length()
 
         return GHyperPlane
 

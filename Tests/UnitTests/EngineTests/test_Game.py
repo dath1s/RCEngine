@@ -1,6 +1,8 @@
 from unittest import TestCase
 from lib.RCEngine.BasicClasses.Game import Game, Vector, Point, CoordinateSystem, EntityList, Entity
 from lib.Math.VectorSpace import VectorSpace
+from lib.Math.Matrix import Matrix
+from lib.RCEngine.BasicClasses.Ray import Ray
 
 
 class TestGame(TestCase):
@@ -92,6 +94,32 @@ class TestGame(TestCase):
         entity_list = EntityList([entity1, entity2])
         game = Game(cs, entity_list)
 
+        def test_planar_rotate():
+            plane = game.HyperPlane()(Point(elements=[0, 0, 1]), Vector(elements=[0, 0, -1]))
+            plane.planar_rotate((1, 2), 90)
+            self.assertEqual(plane.normal, Vector(elements=[0, 1, 0]))
+
+        def test_rotate_3d():
+            plane = game.HyperPlane()(Point(elements=[0, 0, 1]), Vector(elements=[0, 0, -1]))
+            plane.rotate_3d([90, 90, 0])
+            self.assertEqual(plane.normal, Matrix(elements=[[0, -1, 0]]))
+
+        def test_intersection_distance():
+            plane = game.HyperPlane()(Point(elements=[0, 0, 1]), Vector(elements=[0, 0, -1]))
+            v1 = Vector(elements=[1, 0, 0])
+            v2 = Vector(elements=[0, 1, 0])
+            v3 = Vector(elements=[0, 0, 1])
+            vs = VectorSpace([v1, v2, v3])
+            point = Point(3)
+
+            cs = CoordinateSystem(point, vs)
+            ray = Ray(cs, Point(elements=[0, 0, 0]), Vector(elements=[0, 0, 1]))
+            self.assertEqual(plane.intersection_distance(ray), 1)
+
+        test_planar_rotate()
+        test_rotate_3d()
+        test_intersection_distance()
+
     def test_hyper_ellipsoid(self):
         v1 = Vector(elements=[1, 0, 0])
         v2 = Vector(elements=[0, 1, 0])
@@ -105,6 +133,35 @@ class TestGame(TestCase):
         entity2 = Entity(cs)
         entity_list = EntityList([entity1, entity2])
         game = Game(cs, entity_list)
+
+        def test_planar_rotate():
+            hyper_ellipsoid = game.HyperEllipsoid()(Point(elements=[0, 0, 1]), Vector(elements=[0, 0, -1]), [1, 1])
+            hyper_ellipsoid.planar_rotate((1, 2), 90)
+            self.assertEqual(hyper_ellipsoid.direction, Vector(elements=[0, 1, 0]))
+
+        def test_rotate_3d():
+            hyper_ellipsoid = game.HyperEllipsoid()(Point(elements=[0, 0, 1]), Vector(elements=[0, 0, -1]), [1, 1])
+            hyper_ellipsoid.rotate_3d([90, 90, 0])
+            self.assertEqual(hyper_ellipsoid.direction, Matrix(elements=[[0, -1, 0]]))
+
+        def test_intersection_distance():
+            # hyper_ellipsoid = game.HyperEllipsoid()(Point(elements=[0, 0, 1]), Vector(elements=[0, 0, -1]), [1, 1])
+            #
+            # v1 = Vector(elements=[1, 0, 0])
+            # v2 = Vector(elements=[0, 1, 0])
+            # v3 = Vector(elements=[0, 0, 1])
+            # vs = VectorSpace([v1, v2, v3])
+            # point = Point(3)
+            #
+            # cs = CoordinateSystem(point, vs)
+            # ray = Ray(cs, Point(elements=[0, 0, 0]), Vector(elements=[0, 0, 1]))
+            # print(hyper_ellipsoid.intersection_distance(ray))
+            # self.assertEqual(hyper_ellipsoid.intersection_distance(ray), 1)
+            pass
+
+        test_planar_rotate()
+        test_rotate_3d()
+        test_intersection_distance()
 
     def test_canvas(self):
         v1 = Vector(elements=[1, 0, 0])
