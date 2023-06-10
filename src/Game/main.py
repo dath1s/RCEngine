@@ -2,17 +2,26 @@ from lib.RCEngine.BasicClasses.Entity import Entity
 from lib.RCEngine.BasicClasses.EntityList import EntityList
 from lib.RCEngine.BasicClasses.Game import Game
 from lib.RCEngine.BasicClasses.Ray import Ray
-import keyboard
+import curses
+
 
 
 if __name__ == '__main__':
-    def on_press(key):
-        print(key.name)
+    stdscr = curses.initscr()
+    curses.cbreak()
+    stdscr.keypad(1)
 
-    def esc_press():
-        exit()
+    stdscr.addstr(0, 10, "Hit 'esc' to quit")
+    stdscr.refresh()
 
-    keyboard.add_hotkey('esc', esc_press)
-    keyboard.on_press(on_press)
-    while True:
-        pass
+    key = ''
+    while key != ord('esc'):
+        key = stdscr.getch()
+        stdscr.addch(20, 25, key)
+        stdscr.refresh()
+        if key == curses.KEY_UP:
+            stdscr.addstr(2, 20, "Up")
+        elif key == curses.KEY_DOWN:
+            stdscr.addstr(3, 20, "Down")
+
+    curses.endwin()

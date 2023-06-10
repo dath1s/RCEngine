@@ -143,36 +143,3 @@ class TestGame(TestCase):
             hyper_ellipsoid = game.HyperEllipsoid()(Point(elements=[0, 0, 1]), Vector(elements=[0, 0, -1]), [1, 1])
             hyper_ellipsoid.rotate_3d([90, 90, 0])
             self.assertEqual(hyper_ellipsoid.direction, Matrix(elements=[[0, -1, 0]]))
-
-        def test_intersection_distance():
-            # hyper_ellipsoid = game.HyperEllipsoid()(Point(elements=[0, 0, 1]), Vector(elements=[0, 0, -1]), [1, 1])
-            #
-            # v1 = Vector(elements=[1, 0, 0])
-            # v2 = Vector(elements=[0, 1, 0])
-            # v3 = Vector(elements=[0, 0, 1])
-            # vs = VectorSpace([v1, v2, v3])
-            # point = Point(3)
-            #
-            # cs = CoordinateSystem(point, vs)
-            # ray = Ray(cs, Point(elements=[0, 0, 0]), Vector(elements=[0, 0, 1]))
-            # print(hyper_ellipsoid.intersection_distance(ray))
-            # self.assertEqual(hyper_ellipsoid.intersection_distance(ray), 1)
-            pass
-
-        test_planar_rotate()
-        test_rotate_3d()
-        test_intersection_distance()
-
-    def test_canvas(self):
-        v1 = Vector(elements=[1, 0, 0])
-        v2 = Vector(elements=[0, 1, 0])
-        v3 = Vector(elements=[0, 0, 1])
-        vs = VectorSpace([v1, v2, v3])
-        point = Point(3)
-
-        cs = CoordinateSystem(point, vs)
-
-        entity1 = Entity(cs)
-        entity2 = Entity(cs)
-        entity_list = EntityList([entity1, entity2])
-        game = Game(cs, entity_list)

@@ -9,13 +9,16 @@ from lib.RCEngine.BasicClasses.Ray import Ray
 from lib.Exceptions.EngineExceptions.EngineExceptions import GameObjectExceptions
 from lib.Math.Matrix import Matrix
 from math import sqrt
+from lib.RCEngine.BasicClasses.EventSystem import EventSystem
+import curses
 
 
 class Game:
-    def __init__(self, cs: CoordinateSystem, entities: EntityList):
+    def __init__(self, cs: CoordinateSystem, entities: EntityList, es: EventSystem = None):
         self.cs = cs
         self.entities = entities
         self.game_entity_class = self.get_entity_class()
+        self.es = es
 
     def run(self) -> None:
         pass
@@ -24,6 +27,16 @@ class Game:
         pass
 
     def exit(self) -> None:
+        pass
+
+    def get_event_system(self):
+        class GEventSystem(EventSystem):
+            def __init__(other):
+                super().__init__()
+
+        return GEventSystem
+
+    def apply_configuration(self, configuration):
         pass
 
     def get_entity_class(self):
@@ -209,9 +222,48 @@ class Game:
 
             def update(other, camera):
                 ray_matrix = camera.get_rays_matrix(other.n, other.m)
-                for row_ind in range(len(ray_matrix[:])):
-                    for ray_ind in range(len(ray_matrix[row_ind][:])):
-                        for entity in self.entities:
-                            ans = entity.intersection_distance(ray_matrix[row_ind][ray_ind])
+
+                for entity in self.entities:
+                    for row_ind, ray_vector in enumerate(ray_matrix):
+                        for ray_ind, ray in enumerate(ray_vector):
+                            ans = entity.intersection_distance(ray)
                             other.distances[row_ind][ray_ind] = ans if ans < other.distances[row_ind][ray_ind] else \
                                 other.distances[row_ind][ray_ind]
+
+        return GCanvas
+
+    def Console(self):
+        class GConsole(self.Canvas()):
+            def __init__(other):
+                other.charmap = ".:;><+r*zsvfwqkP694VOGbUAKXH8RD#$B0MNWQ%&@"
+
+            def draw(self):
+                # charmap 42 symbols
+                pass
+
+    def Configuration(self):
+        class GConfiguration:
+            def __init__(self, filepath: str = None):
+                self.filepath = None if filepath is None else filepath
+                self.configuration: dict[str: any] = dict()
+
+            def set_variable(self, var: str, value):
+                self.configuration[var] = value
+
+            def execute_file(self, filepath: str):
+                self.filepath = filepath
+
+            def save(self, filepath: str):
+                if filepath is None:
+                    raise Exception
+                with open(filepath) as f:
+                    for key in self.configuration.keys():
+                        f.write(f"{key} : {self.configuration[key]}\n")
+
+            def __getitem__(self, item):
+                return self.configuration[item]
+
+            def __setitem__(self, key, value):
+                self.configuration[key] = value
+
+        return GConfiguration
