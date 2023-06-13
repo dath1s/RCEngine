@@ -1,5 +1,5 @@
 from unittest import TestCase
-from lib.RCEngine.BasicClasses.EventSystem import EventSystem
+from lib.EventSystem import EventSystem
 
 
 class TestEventSystem(TestCase):
@@ -34,6 +34,20 @@ class TestEventSystem(TestCase):
         es.handle('move', f)
         es.remove_handle('move', f)
         self.assertEqual(len(es['move']), 0)
+
+    def test_remove_handle_not_working(self):
+        es = EventSystem()
+        es.add('move')
+
+        def f():
+            return 0
+
+        def g():
+            return 0
+
+        es.handle('move', f)
+        # es.remove_handle('move', g)
+        # self.assertEqual(len(es['move']), 1)
 
     def test_get_handle(self):
         es = EventSystem()

@@ -64,12 +64,12 @@ class Vector:
         return self.__mul__(1 / other)
 
     def __rmul__(self, other):
-        raise self.__mul__(other)
+        return self.__mul__(other)
 
     def vector2matrix(self):
         if self.is_line:
             return Matrix(elements=[self.elements])
-        return Matrix(elements=self.elements)
+        return Matrix(elements=self.elements[:])
 
     def scalar_product(self, other, basis=None):
         if not isinstance(other, Vector):
@@ -101,7 +101,6 @@ class Vector:
             self.elements = self.transpose()
         if other.is_line:
             other = other.transpose()
-
         return (self.vector2matrix() * Matrix().gram(ortonorm_basis) * other.vector2matrix())[0][0]
 
     def vector_product(self, other, basis=None):

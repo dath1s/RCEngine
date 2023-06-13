@@ -34,4 +34,3 @@ class EventSystem:
 
     def __getitem__(self, item: str):
         return self.events[item]
-

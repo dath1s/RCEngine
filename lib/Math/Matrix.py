@@ -52,12 +52,13 @@ class Matrix:
                 ])
             case Matrix():
                 if self.m != other.n:
-                    raise MatrixException.MATRIX_WRONG_SIZES(self.n, self.m, other.n, other.m)
+                    raise Exception
 
                 new_matrix = Matrix(elements=[[0 for _ in range(other.m)] for _ in range(self.n)])
                 for i in range(self.n):
                     for j in range(other.m):
-                        new_matrix[i][j] = sum([self[:][i][f] * other.transpose()[:][j][f] for f in range(len(self[i]))])
+                        new_matrix[i][j] = sum(
+                            [self[:][i][f] * other.transpose()[:][j][f] for f in range(len(self[i]))])
 
                 return new_matrix
 

@@ -4,7 +4,7 @@ from lib.Exceptions.EngineExceptions.EngineExceptions import EntityListException
 
 
 class EntityList:
-    def __init__(self, entities: list[Entity]) -> None:
+    def __init__(self, entities: list[Entity] = []) -> None:
         self.entities = entities
 
     def append(self, entity: Entity) -> None:

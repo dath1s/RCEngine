@@ -1,27 +1,42 @@
-from lib.RCEngine.BasicClasses.Entity import Entity
+from lib.Math.VectorSpace import VectorSpace
+from lib.RCEngine.BasicClasses.Game import *
+from lib.EventSystem import EventSystem
 from lib.RCEngine.BasicClasses.EntityList import EntityList
-from lib.RCEngine.BasicClasses.Game import Game
-from lib.RCEngine.BasicClasses.Ray import Ray
-import curses
-
-
 
 if __name__ == '__main__':
-    stdscr = curses.initscr()
-    curses.cbreak()
-    stdscr.keypad(1)
+    cs = CoordinateSystem(Point(elements=[0, 0, 0]),
+                          VectorSpace(
+                              [Vector(elements=[1, 0, 0]), Vector(elements=[0, 1, 0]), Vector(elements=[0, 0, 1])]))
 
-    stdscr.addstr(0, 10, "Hit 'esc' to quit")
-    stdscr.refresh()
+    game = Game(cs)
+    camera = game.Camera()(
+        position=Point(elements=[1, 1, -80]),
+        fov=90, vfov=None,
+        draw_dist=110,
+        look_at=Point(elements=[1, 1, 1])
+    )
 
-    key = ''
-    while key != ord('esc'):
-        key = stdscr.getch()
-        stdscr.addch(20, 25, key)
-        stdscr.refresh()
-        if key == curses.KEY_UP:
-            stdscr.addstr(2, 20, "Up")
-        elif key == curses.KEY_DOWN:
-            stdscr.addstr(3, 20, "Down")
+    event_system = EventSystem()
 
-    curses.endwin()
+    event_system.add("move")
+    event_system.add("rotate_h")
+    event_system.add("rotate_v")
+
+    event_system.handle("move", camera.move)
+    event_system.handle("rotate_h", camera.planar_rotate)
+    event_system.handle("rotate_v", camera.set_direction)
+
+    game.entities = EntityList()
+    game.es = event_system
+
+    hyper_ellipsoid = game.HyperEllipsoid()(
+        pos=Point(elements=[1, 1, -8]),
+        dir=Vector(elements=[1, 1, 0]),
+        semiaxes=[0.5, 0.5, 0.5]
+    )
+    game.entities.append(hyper_ellipsoid)
+
+    canvas = game.Canvas()(40, 80)
+    console = game.Console()
+
+    console.draw(canvas, console)

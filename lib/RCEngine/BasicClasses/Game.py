@@ -6,15 +6,15 @@ from math import pi, atan, tan
 from config.globals import *
 from lib.RCEngine.BasicClasses.Entity import Entity
 from lib.RCEngine.BasicClasses.Ray import Ray
-from lib.Exceptions.EngineExceptions.EngineExceptions import GameObjectExceptions
 from lib.Math.Matrix import Matrix
 from math import sqrt
-from lib.RCEngine.BasicClasses.EventSystem import EventSystem
-import curses
+from lib.EventSystem import EventSystem
+from curses import wrapper
+from math import sqrt
 
 
 class Game:
-    def __init__(self, cs: CoordinateSystem, entities: EntityList, es: EventSystem = None):
+    def __init__(self, cs: CoordinateSystem, entities: EntityList = [], es: EventSystem = None):
         self.cs = cs
         self.entities = entities
         self.game_entity_class = self.get_entity_class()
@@ -55,7 +55,7 @@ class Game:
 
     def Object(self):
         class GObject(self.get_entity_class()):
-            def __init__(self, pos: Point, dir: Vector):
+            def __init__(self, pos: Point, dir: Vector | None):
                 super().__init__()
                 self.cs = self.cs
                 self.set_property('position', pos)
@@ -85,7 +85,7 @@ class Game:
         class GCamera(self.Object()):
             def __init__(other, position: Point, fov: float, draw_dist: float, vfov: float = None,
                          look_at: Point = None):
-                super().__init__(position, look_at)
+                super().__init__(position, None)
                 other.set_property('fov', round(fov * pi / 180, PRECISION))
                 other.set_property('draw_dist', round(draw_dist, PRECISION))
                 other.entity = Entity(other.cs)
@@ -98,28 +98,31 @@ class Game:
                 if look_at is not None:
                     other.set_property('look_at', look_at)
 
+                other.set_property('direction', Vector(
+                    elements=[other['look_at'][i] - other['position'][i] for i in
+                              range(len(other['position'][:]))]).normalize())
+
             def get_rays_matrix(self, n: int, m: int):
-                delta_alpha = round(self['fov'] / n, PRECISION)
-                delta_beta = round(self['vfov'] / m, PRECISION)
-                zero_angle_x = round(self['fov'] / 2, PRECISION)
-                zero_angle_y = round(self['vfov'] / 2, PRECISION)
+                deltaAlpha = self.fov / n
+                deltaBetta = self.vfov / m
 
-                if self['direction'] is None:
-                    direction = Vector(
-                        elements=[self['look_at'][i] - self['position'][i] for i in range(len(self['position']))])
-                else:
-                    direction = self['direction']
+                zeroAngleX = self.fov / 2.0
+                zeroAngleY = self.vfov / 2.0
 
-                ray_matrix = Matrix(n, m)
-                for i in range(n):
-                    cur_angle_x = delta_alpha * i - zero_angle_x
-                    for j in range(m):
-                        cur_angle_y = delta_beta * j - zero_angle_y
-                        proection_dir = direction.rotate([1, 2], cur_angle_x).rotate([0, 2], cur_angle_y)
-                        proection_dir *= (direction.length() ** 2) / direction.scalar_product(proection_dir)
-                        ray_matrix[i][j] = Ray(self.cs, self['position'], proection_dir)
+                position = self.position
+                direction = self.direction
 
-                return ray_matrix
+                rayMatrix = Matrix(n, m)
+                for r in range(n):
+                    curAngleX = deltaAlpha * r - zeroAngleX
+                    for c in range(m):
+                        curAngleY = deltaBetta * c - zeroAngleY
+
+                        proectionDir = direction.rotate([1, 2], curAngleX).rotate([0, 2], curAngleY)
+                        projectionDir = direction.length() ** 2 / direction.scalar_product(proectionDir) * proectionDir
+                        rayMatrix[r][c] = Ray(self.cs, position, projectionDir)
+
+                return rayMatrix
 
         return GCamera
 
@@ -171,39 +174,29 @@ class Game:
                 super(GHyperEllipsoid, self).rotate_3d(angles)
 
             def intersection_distance(self, ray: Ray):
-                ray_pt = ray.initial_pt
-                ray_dir = ray.dir
+                A, B, C, D = [0 for _ in range(4)]
+                for i in range(len(self.semiaxes)):
+                    A += ray.dir[i] ** 2
+                    B += (ray.initial_pt[i] - self.position[i]) * ray.dir[i]
+                    C += (ray.initial_pt[i] - self.position[i]) ** 2
+                    D += self.semiaxes[i] ** 2
 
-                ellips_dir = self.direction
+                B *= 2
+                C -= D
 
-                alpha = (ray_dir[0] ** 2) / (ellips_dir[0] ** 2) + (ray_dir[1] ** 2) / (ellips_dir[1] ** 2) + (
-                        ray_dir[2] ** 2) / (ellips_dir[2] ** 2)
-                beta = 2 * ((ray_dir[0] * ray_pt[0]) / (ellips_dir[0] ** 2) + (ray_dir[1] * ray_pt[1]) / (
-                        ellips_dir[1] ** 2) + (ray_dir[2] * ray_pt[2]) / (ellips_dir[2] ** 2))
-                gamma = (ray_pt[0] ** 2) / (ellips_dir[0] ** 2) + (ray_pt[1] ** 2) / (ellips_dir[1] ** 2) + (
-                        ray_pt[2] ** 2) / (ellips_dir[2] ** 2)
+                discr = B ** 2 - 4 * A * C
+                if discr < 0:
+                    return 999
 
-                disc = beta ** 2 - 4 * alpha * gamma
-                if disc < 0:
-                    return -1
-                else:
-                    t1 = (-beta + sqrt(disc)) / (2 * alpha)
-                    t2 = (-beta - sqrt(disc)) / (2 * alpha)
+                sol1, sol2 = (-B - sqrt(discr)) / (2 * A), (-B + sqrt(discr)) / (2 * A)
 
-                    vec1 = ray_dir * t1
-                    vec2 = ray_dir * t2
-
-                    if (t1 > 0) and (t2 > 0):
-                        return min(vec1.length(), vec2.length())
-
-                    elif (t1 > 0) and (t2 <= 0):
-                        return vec1.length()
-
-                    elif (t1 <= 0) and (t2 < 0):
-                        return vec2.length()
-
-                    else:
-                        return -1
+                if sol1 < 0:
+                    if sol2 < 0:
+                        return 999
+                    return sol2
+                if sol2 < 0:
+                    return sol1
+                return min(sol1, sol2)
 
         return GHyperEllipsoid
 
@@ -217,13 +210,14 @@ class Game:
                     for col in range(len(other.distances[row][:])):
                         other.distances[row][col] = 999
 
-            def draw(self) -> None:
-                pass
-
             def update(other, camera):
                 ray_matrix = camera.get_rays_matrix(other.n, other.m)
+                other.distances = Matrix(other.n, other.m)
+                for row in range(len(other.distances[:])):
+                    for col in range(len(other.distances[row][:])):
+                        other.distances[row][col] = 999
 
-                for entity in self.entities:
+                for entity in self.entities.entities:
                     for row_ind, ray_vector in enumerate(ray_matrix):
                         for ray_ind, ray in enumerate(ray_vector):
                             ans = entity.intersection_distance(ray)
@@ -235,11 +229,57 @@ class Game:
     def Console(self):
         class GConsole(self.Canvas()):
             def __init__(other):
-                other.charmap = ".:;><+r*zsvfwqkP694VOGbUAKXH8RD#$B0MNWQ%&@"
+                other.charmap = ".:;><+r*zsvfwqkP694VOGbUAKXH8RD#$B0MNWQ%&@"[::-1]
 
-            def draw(self):
-                # charmap 42 symbols
-                pass
+            def draw(self, canvas, camera):
+                def main(stdscr):
+                    stdscr.clear()
+
+                    while True:
+                        canvas.update(camera)
+
+                        stdscr.addstr(47, 0, f"camera at: {str(camera.position)}")
+                        stdscr.addstr(48, 0, f"camera direction: {str(camera.direction)}")
+
+                        for i in range(canvas.n):
+                            for j in range(canvas.m):
+                                if canvas.distances[i][j] >= camera.draw_dist:
+                                    stdscr.addch(i, j, '.')
+                                else:
+                                    ratio = canvas.distances[i][j] / camera.draw_dist
+                                    ind = int(ratio * 38)
+                                    stdscr.addch(i, j, self.charmap[ind])
+                        camera.set_direction(camera.direction + Vector(elements=[0, 0, 0.05]))
+
+                        key = stdscr.getkey()
+                        if key == "q":
+                            exit(0)
+                        if key == 'w':
+                            camera.move(Vector(elements=[0, 0, 1]))
+                        if key == 's':
+                            camera.move(Vector(elements=[0, 0, -1]))
+                        if key == ' ':
+                            camera.move(Vector(elements=[0, 0.2, 0]))
+                        if key == 'v':
+                            camera.move(Vector(elements=[0, -0.2, 0]))
+                        if key == 'a':
+                            camera.move(Vector(elements=[-0.2, 0, 0]))
+                        if key == 'd':
+                            camera.move(Vector(elements=[0.2, 0, 0]))
+                        if key == 'KEY_RIGHT':
+                            camera.direction = camera.direction.rotate([0, 2], 0.2)
+                        if key == 'KEY_LEFT':
+                            camera.direction = camera.direction.rotate([0, 2], -0.2)
+                        if key == 'KEY_UP':
+                            camera.direction = camera.direction.rotate([1, 2], -0.2)
+                        if key == 'KEY_DOWN':
+                            camera.direction = camera.direction.rotate([1, 2], 0.2)
+
+                        stdscr.refresh()
+
+                wrapper(main)
+
+        return GConsole
 
     def Configuration(self):
         class GConfiguration:
