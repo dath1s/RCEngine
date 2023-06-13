@@ -2,6 +2,7 @@ from lib.Math.VectorSpace import VectorSpace
 from lib.RCEngine.BasicClasses.Game import *
 from lib.EventSystem import EventSystem
 from lib.RCEngine.BasicClasses.EntityList import EntityList
+from config.globals import *
 
 if __name__ == '__main__':
     cs = CoordinateSystem(Point(elements=[0, 0, 0]),
@@ -11,8 +12,8 @@ if __name__ == '__main__':
     game = Game(cs)
     camera = game.Camera()(
         position=Point(elements=[1, 1, -80]),
-        fov=90, vfov=None,
-        draw_dist=110,
+        fov=fov, vfov=None,
+        draw_dist=draw_dist,
         look_at=Point(elements=[1, 1, 1])
     )
 
@@ -36,7 +37,7 @@ if __name__ == '__main__':
     )
     game.entities.append(hyper_ellipsoid)
 
-    canvas = game.Canvas()(40, 80)
+    canvas = game.Canvas()(canvas_h, canvas_v)
     console = game.Console()
 
     console.draw(canvas, console)
