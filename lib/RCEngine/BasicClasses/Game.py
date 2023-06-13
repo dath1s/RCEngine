@@ -7,7 +7,6 @@ from config.globals import *
 from lib.RCEngine.BasicClasses.Entity import Entity
 from lib.RCEngine.BasicClasses.Ray import Ray
 from lib.Math.Matrix import Matrix
-from math import sqrt
 from lib.EventSystem import EventSystem
 from curses import wrapper
 from math import sqrt
@@ -232,6 +231,18 @@ class Game:
                 other.charmap = ".:;><+r*zsvfwqkP694VOGbUAKXH8RD#$B0MNWQ%&@"[::-1]
 
             def draw(self, canvas, camera):
+                event_system = EventSystem()
+
+                event_system.add("move")
+                event_system.add("rotate_h")
+                event_system.add("rotate_v")
+
+                event_system.handle("move", camera.move)
+                event_system.handle("rotate_h", camera.planar_rotate)
+                event_system.handle("rotate_v", camera.set_direction)
+
+                self.es = event_system
+
                 def main(stdscr):
                     stdscr.clear()
 
